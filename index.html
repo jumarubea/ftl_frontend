@@ -201,7 +201,9 @@
       };
 
       try {
-        const response = await fetch('http://127.0.0.1:8000/get-recommendations', {
+        const API_URL = 'https://ftl-backenduvicorn-main-app-host-0-0-0-0.onrender.com/get-recommendations';
+
+        const response = await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(inputData),
