@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Factory Recommendation System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      margin: 0;
+      overflow-y: auto;
+      padding-top: 50px;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      width: 400px;
+      margin: 20px 0;
+      position: relative;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input,
+    select,
+    button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .result {
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Factory Recommendation</h1>
+
+    <div class="form-group">
+      <label for="user-type">Are you a producer or a consumer?</label>
+      <select id="user-type">
+        <option value="producer">Producer</option>
+        <option value="consumer">Consumer</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="factory-name">Factory Name (Optional):</label>
+      <input type="text" id="factory-name" placeholder="E.g., Factory_440">
+    </div>
+
+    <div class="form-group">
+      <label for="location">Location:</label>
+      <input type="text" id="location" placeholder="E.g., Shenzhen, China">
+    </div>
+
+    <div class="form-group">
+      <label for="industry-type">Industry Type:</label>
+      <input type="text" id="industry-type" placeholder="E.g., Plastics">
+    </div>
+
+    <div class="form-group">
+      <label for="capacity">Production Capacity:</label>
+      <input type="number" id="capacity" min="1" placeholder="E.g., 5000" , required>
+    </div>
+
+    <div id="producer-fields" style="display: none;">
+      <div class="form-group">
+        <label for="byproduct-type">Byproduct Type:</label>
+        <input type="text" id="byproduct-type" placeholder="E.g., Bio-waste">
+      </div>
+
+      <div class="form-group">
+        <label for="byproduct-quantity">Byproduct Quantity:</label>
+        <input type="number" id="byproduct-quantity" min="1" placeholder="E.g., 1000">
+      </div>
+
+      <div class="form-group">
+        <label for="byproduct-frequency">Byproduct Frequency:</label>
+        <input type="text" id="byproduct-frequency" placeholder="E.g., Daily">
+      </div>
+    </div>
+
+    <div id="consumer-fields" style="display: none;">
+      <div class="form-group">
+        <label for="required-byproduct">Required Byproduct:</label>
+        <input type="text" id="required-byproduct" placeholder="E.g., Recycled Plastic">
+      </div>
+
+      <div class="form-group">
+        <label for="utilization-method">Utilization Method:</label>
+        <input type="text" id="utilization-method" placeholder="E.g., Recycling">
+      </div>
+
+      <div class="form-group">
+        <label for="demand-scale">Demand Scale:</label>
+        <input type="text" id="demand-scale" placeholder="E.g., High">
+      </div>
+
+      <div class="form-group">
+        <label for="frequency-of-use">Frequency of Use:</label>
+        <input type="text" id="frequency-of-use" placeholder="E.g., Daily">
+      </div>
+    </div>
+
+    <button onclick="getRecommendations()">Get Recommendations</button>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    // Show/hide fields based on user type
+    document.getElementById('user-type').addEventListener('change', function () {
+      const userType = this.value;
+      document.getElementById('producer-fields').style.display = userType === 'producer' ? 'block' : 'none';
+      document.getElementById('consumer-fields').style.display = userType === 'consumer' ? 'block' : 'none';
+    });
+
+
+    async function getRecommendations() {
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML = ''; // Clear previous results
+
+      const userType = document.getElementById('user-type').value;
+      const factoryName = document.getElementById('factory-name').value;
+      const location = document.getElementById('location').value;
+      const industryType = document.getElementById('industry-type').value;
+      const capacity = document.getElementById('capacity').value;
+
+      if (!location || !industryType || !capacity) {
+        alert('Please fill in all required fields.');
+        return;
+      }
+
+      let byproductType = '', byproductQuantity = '', byproductFrequency = '';
+      let requiredByproduct = '', utilizationMethod = '', demandScale = '', frequencyOfUse = '';
+
+      if (userType === 'producer') {
+        byproductType = document.getElementById('byproduct-type').value;
+        byproductQuantity = document.getElementById('byproduct-quantity').value;
+        byproductFrequency = document.getElementById('byproduct-frequency').value;
+      } else if (userType === 'consumer') {
+        requiredByproduct = document.getElementById('required-byproduct').value;
+        utilizationMethod = document.getElementById('utilization-method').value;
+        demandScale = document.getElementById('demand-scale').value;
+        frequencyOfUse = document.getElementById('frequency-of-use').value;
+      }
+
+      const inputData = {
+        user_type: userType,
+        factory_name: factoryName,
+        location: location,
+        industry_type: industryType,
+        production_capacity: parseInt(capacity),
+        byproduct_type: byproductType,
+        byproduct_quantity: parseInt(byproductQuantity),
+        byproduct_frequency: byproductFrequency,
+        required_byproduct: requiredByproduct,
+        utilization_method: utilizationMethod,
+        demand_scale: demandScale,
+        frequency_of_use: frequencyOfUse
+      };
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/get-recommendations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(inputData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.detail || 'Failed to fetch recommendations');
+        }
+
+        const data = await response.json();
+        console.log(data); // Debugging: Check the structure of the response
+
+        if (!Array.isArray(data.factories)) {
+          throw new Error('Invalid response format');
+        }
+
+        if (data.factories.length === 0) {
+          resultDiv.innerHTML = '<p>No recommendations found.</p>';
+          return;
+        }
+
+        // Generate HTML for recommendations
+        const recommendationList = data.factories
+          .map(
+            (factory) =>
+              `<li><strong>${factory.name}</strong> - ${factory.location} (${factory.industry})</li>`
+          )
+          .join('');
+
+        resultDiv.innerHTML = `<h3>Recommended Factories:</h3><ul>${recommendationList}</ul>`;
+      } catch (error) {
+        resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+      }
+    }
+  </script>
+
+</body>
+
+</html>
